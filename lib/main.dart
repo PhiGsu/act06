@@ -48,31 +48,40 @@ void setupWindow() {
 /// _not_ depend on Provider.
 class Counter with ChangeNotifier {
   int value = 0;
-  String message = "You're a child";
+  String message = "You're a child!";
   Color background = Colors.lightBlue;
 
   void increment(int change) {
-    if (value + change < 0) return;
+    if (value + change < 0 || value + change > 99) return;
     value += change;
 
+    _updateProperties();
+    notifyListeners();
+  }
+
+  void setValue(int newValue) {
+    value = newValue;
+    _updateProperties();
+    notifyListeners();
+  }
+
+  void _updateProperties() {
     if (value < 13) {
-      message = "You're a child";
+      message = "You're a child!";
       background = Colors.lightBlue;
     } else if (value < 20) {
       message = "Teenager time!";
       background = Colors.lightGreen;
     } else if (value < 31) {
-      message = "You're a young adult";
+      message = "You're a young adult!";
       background = Colors.yellow;
     } else if (value < 51) {
-      message = "You're an adult now";
+      message = "You're an adult now!";
       background = Colors.orange;
     } else {
       message = "Golden years!";
       background = Colors.grey;
     }
-
-    notifyListeners();
   }
 }
 
@@ -108,7 +117,7 @@ class MyHomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(counter.message),
-                    Text("${counter.value}",
+                    Text("I am ${counter.value} years old",
                         style: Theme.of(context).textTheme.headlineMedium),
                     FloatingActionButton(
                         onPressed: () {
@@ -132,10 +141,17 @@ class MyHomePage extends StatelessWidget {
                         },
                         child: const Text("Increase Age")),
                     FloatingActionButton(
-                        onPressed: () {
-                          counter.increment(-1);
-                        },
-                        child: const Text("Reduce Age")),
+                      onPressed: () {
+                        counter.increment(-1);
+                      },
+                      child: const Text("Reduce Age")),
+                    Slider(
+                      min: 0,
+                      max: 99,
+                      value: counter.value.toDouble(),
+                      onChanged: (x) => counter.setValue(x.toInt()),
+                      activeColor: getProgressBarColor(counter.value),
+                    )
                     // Consumer looks for an ancestor Provider widget
                     // and retrieves its model (Counter, in this case).
                     // Then it uses that model to build widgets, and will trigger
@@ -144,5 +160,15 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
             ));
+  }
+
+  Color getProgressBarColor(int value) {
+    if (value < 34) {
+      return Colors.green;
+    } else if (value < 67) {
+      return Colors.yellow;
+    } else {
+      return Colors.red;
+    }
   }
 }
